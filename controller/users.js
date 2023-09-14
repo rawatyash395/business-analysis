@@ -16,7 +16,7 @@ const login = async (req, res) => {
         const id = userData._id;
         jwt.sign(
           { id },
-          process.env.JWT_TOKEN,
+          process.env.JWT_TOKEN || "jwt_token",
           { expiresIn: "30d" },
           async (err, token) => {
             if (err) {
@@ -45,7 +45,10 @@ const login = async (req, res) => {
 
 const registerUser = async (req, res) => {
   try {
-    const password = await bcrypt.hash(req.body.password, +process.env.SALT);
+    const password = await bcrypt.hash(
+      req.body.password,
+      +process.env.SALT || 9
+    );
     const newUser = new user({
       email: req.body.email,
       password,
