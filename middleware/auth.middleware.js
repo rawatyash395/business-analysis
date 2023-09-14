@@ -11,7 +11,10 @@ const verifyToken = async (req, res, next) => {
         req.token = token;
         const decodedToken = req.headers.authorization.split(" ")[1];
 
-        const decode = jwt.decode(decodedToken, process.env.JWT_TOKEN);
+        const decode = jwt.decode(
+          decodedToken,
+          process.env.JWT_TOKEN || "jwt_token"
+        );
         if (decode === null) {
           return res.status(401).send("Please,Login again");
         } else {
@@ -19,13 +22,17 @@ const verifyToken = async (req, res, next) => {
           if (record === null) {
             return res.status(403).send("User does not exist.");
           } else {
-            jwt.verify(decodedToken, process.env.JWT_TOKEN, function (err) {
-              if (err) {
-                res.status(400).send("Please,Login again");
-                next("Please,Login again");
+            jwt.verify(
+              decodedToken,
+              process.env.JWT_TOKEN || "jwt_token",
+              function (err) {
+                if (err) {
+                  res.status(400).send("Please,Login again");
+                  next("Please,Login again");
+                }
+                next();
               }
-              next();
-            });
+            );
           }
         }
       } else {
