@@ -3,13 +3,12 @@ const revenueData = require("../assets/revenue_data_new.json");
 
 const addRevenue = async (req, res) => {
   try {
-    const newYearlyRevenue = new YearlyRevenue();
-    await newYearlyRevenue.collection.insertMany(revenueData);
-    res.status(201).json({
+    await YearlyRevenue.insertMany(revenueData);
+    return res.status(201).json({
       message: "Yearly revenue added successfully.",
     });
   } catch (e) {
-    res.status(500).json({
+    return res.status(500).json({
       message: e.message,
     });
   }
@@ -17,7 +16,7 @@ const addRevenue = async (req, res) => {
 
 const getRevenue = async (req, res) => {
   try {
-    const sortType = (req.query.sort = "desc" ? -1 : 1);
+    const sortType = req.query.sort === "desc" ? -1 : 1;
     const sortProperty = req.query.sortBy ? req.query.sortBy : "acv";
     const page = Math.max(0, req.query.page - 1);
     const revenues = await Promise.all([
@@ -71,7 +70,7 @@ const searchRevenue = async (req, res) => {
 const getPivotChartData = async (req, res) => {
   try {
     let revenueType = req.query.revenueType ? req.query.revenueType : null;
-    const sortType = (req.query.sort = "desc" ? -1 : 1);
+    const sortType = req.query.sort === "desc" ? -1 : 1;
     const sortProperty = req.query.sortBy ? req.query.sortBy : "acv";
     const revenueTypesData = await YearlyRevenue.find().distinct(
       "revenue_type"

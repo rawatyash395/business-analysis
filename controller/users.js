@@ -7,37 +7,32 @@ const login = async (req, res) => {
     const email = req.body.email;
 
     const userData = await user.findOne({ email });
-    if (userData) {
-      const isMatched = await bcrypt.compare(
-        req.body.password,
-        userData.password
-      );
-      if (isMatched) {
-        const id = userData._id;
-        jwt.sign(
-          { id },
-          process.env.JWT_TOKEN || "jwt_token",
-          { expiresIn: "30d" },
-          async (err, token) => {
-            if (err) {
-              res.json({
-                error: err.message,
-              });
-            } else {
-              const email = userData.email;
-              res.status(200).json({
-                token,
-                email,
-              });
-            }
-          }
-        );
-      } else {
-        return res.status(400).send("Your Password may be wrong");
-      }
-    } else {
-      return res.status(401).send("User doesn't exist!");
+    if (!userData) {
+      return res.status(400).send("User doesn't exist!");
     }
+    const isMatched = await bcrypt.compare(
+      req.body.password,
+      userData.password
+    );
+    if (!isMatched) {
+      return res.status(400).send("Incorrect password");
+    }
+    const id = userData._id;
+    jwt.sign(
+      { id },
+      process.env.JWT_TOKEN || "jwt_token",
+      { expiresIn: "30d" },
+      async (err, token) => {
+        if (err) {
+          return res.json({ error: err.message });
+        }
+        const email = userData.email;
+        return res.status(200).json({
+          token,
+          email,
+        });
+      }
+    );
   } catch (e) {
     return res.status(401).send(e.message);
   }
@@ -54,9 +49,9 @@ const registerUser = async (req, res) => {
       password,
     });
     await newUser.save();
-    res.status(201).json("User registered successfully.");
+    return res.status(201).json("User registered successfully.");
   } catch (e) {
-    res.status(500).json(e.message);
+    return res.status(500).json(e.message);
   }
 };
 
