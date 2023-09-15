@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const YearlyRevenueSchema = new mongoose.Schema(
   {
+    S_no: Number,
     line_of_business: String,
     revenue_type: String,
     product: String,

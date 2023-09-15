@@ -15,5 +15,10 @@ app.get(
   middleware.verifyToken,
   revenueController.searchRevenue
 );
+app.get(
+  "/pivot-chart",
+  middleware.verifyToken,
+  revenueController.getPivotChartData
+);
 
 module.exports = app;
